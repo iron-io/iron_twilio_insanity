@@ -41,48 +41,8 @@ get '/done' do
 end
 
 
-get '/receive' do
-  puts "-------------- RECEIVING REQUEST ---------------"
-  puts "FROM: #{params[:From]}"
-  puts "BODY: #{params[:Body]}"
-  puts "------------------------------------------------"
-
-  number = params[:From].reverse.chop.chop.reverse
-
-  move_day_forward(number) if params[:Body].downcase == "done"
-end
-
 
 private
-
-def move_day_forward(number)
-  config = YAML.load_file("config.yml")
-  twilio = Twilio::REST::Client.new config['twilio']['account_sid'], config['twilio']['auth_token']
-
-  cache = get_cache("insanity-#{number}")
-  cache.increment("day")
-
-  message = "Great job today. As Shaun T would say \"#{shaunism.chomp}\""
-
-  puts "Sending Shaunism"
-  twilio.account.sms.messages.create(
-    :from => config['app']['from'],
-    :to => number,
-    :body => message
-  )
-  puts "Congratulations! We've moved your workout forward one day!"
-end
-
-
-def shaunism
-  all = []
-  File.open('shaunisms.txt', 'r') do |f|
-    while line = f.gets
-      all << line.chomp
-    end
-  end
-  all[rand(all.size)]
-end
 
 
 def get_cache(name)
@@ -95,7 +55,7 @@ end
 def load_schedule(cache)
   puts "Loading Cache Up...."
   i=0
-  File.open('insanity_schedule.txt', 'r') do |f|
+  File.open('lists/insanity_schedule.txt', 'r') do |f|
     while line = f.gets
       cache.put(i.to_s, line)
       i+=1

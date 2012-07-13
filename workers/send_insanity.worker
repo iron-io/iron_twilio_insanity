@@ -5,4 +5,4 @@ name "SendInsanity"
 gem "twilio-ruby"
 gem "iron_cache"
 
-file "config.yml"
+file "../config/config.yml"
